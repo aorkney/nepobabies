@@ -143,15 +143,17 @@ conservative.rate<-list()
 novel.rate<-list()
 AIC.dif <- list()
 for(i in 1:length(alt.tree)){
-	model1.alt <- mvBM(tree=alt.tree[[i]], data=trait[alt.tree[[i]]$tip], model='BM1')
-	model2.alt <- mvBM(tree=alt.tree[[i]], data= trait[alt.tree[[i]]$tip] , model='BMM')
-	conservative.rate[[i]]<-model2.alt$sigma[[1]]
-	novel.rate[[i]]<-model2.alt$sigma[[2]]
-	results <- list(model1.alt,model2.alt)
-	weights <- aicw(results)
-	preferred.model[[i]] <- which(weights$diff==0)
-	AIC.dif[[i]] <- max(weights$diff)
-	print(paste((i*100)/length(alt.tree),'% done'))
+	model1.alt <- mvBM(tree=alt.tree[[i]], data=trait[alt.tree[[i]]$tip], model='BM1', optimization ="subplex")
+	model2.alt <- mvBM(tree=alt.tree[[i]], data= trait[alt.tree[[i]]$tip] , model='BMM', optimization ="subplex")
+	if(model1.alt$conv==0 & model1.alt$hess.value==0 & model2.alt$conv==0 & model2.alt$hess==0){
+		conservative.rate[[i]]<-model2.alt$sigma[[1]]
+		novel.rate[[i]]<-model2.alt$sigma[[2]]
+		results <- list(model1.alt,model2.alt)
+		weights <- mvMORPH::aicw(results)
+		preferred.model[[i]] <- which(weights$diff==0)
+		AIC.dif[[i]] <- max(weights$diff)
+		print(paste((i*100)/length(alt.tree),'% done'))
+	}
 }
 
 table(unlist(preferred.model))
@@ -210,15 +212,17 @@ conservative.rate<-list()
 novel.rate<-list()
 AIC.dif <- list()
 for(i in 1:length(alt.tree)){
-	model1.alt <- mvBM(tree=alt.tree[[i]], data=trait[alt.tree[[i]]$tip], model='BM1')
-	model2.alt <- mvBM(tree=alt.tree[[i]], data= trait[alt.tree[[i]]$tip] , model='BMM')
-	conservative.rate[[i]]<-model2.alt$sigma[[1]]
-	novel.rate[[i]]<-model2.alt$sigma[[2]]
-	results <- list(model1.alt,model2.alt)
-	weights <- aicw(results)
-	preferred.model[[i]] <- which(weights$diff==0)
-	AIC.dif[[i]] <- max(weights$diff)
-	print(paste((i*100)/length(alt.tree),'% done'))
+	model1.alt <- mvBM(tree=alt.tree[[i]], data=trait[alt.tree[[i]]$tip], model='BM1', optimization ="subplex")
+	model2.alt <- mvBM(tree=alt.tree[[i]], data= trait[alt.tree[[i]]$tip] , model='BMM', optimization ="subplex")
+	if(model1.alt$conv==0 & model1.alt$hess.value==0 & model2.alt$conv==0 & model2.alt$hess==0){
+		conservative.rate[[i]]<-model2.alt$sigma[[1]]
+		novel.rate[[i]]<-model2.alt$sigma[[2]]
+		results <- list(model1.alt,model2.alt)
+		weights <- mvMORPH::aicw(results)
+		preferred.model[[i]] <- which(weights$diff==0)
+		AIC.dif[[i]] <- max(weights$diff)
+		print(paste((i*100)/length(alt.tree),'% done'))
+	}
 }
 table(unlist(preferred.model))
 # There is a substantial preference for a two-rate model 

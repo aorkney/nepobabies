@@ -76,13 +76,15 @@ altricial.rate<-list()
 precocial.rate<-list()
 weights <- list()
 for(i in 1:length(tree)){ # For all 1000 possible histories of developmental strategy evolution
-	model1 <- mvBM(tree=tree[[i]], data=trait[tree[[i]]$tip], model='BM1') # Compute a single rate brownian model
-	model2 <- mvBM(tree=tree[[i]], data= trait[tree[[i]]$tip] , model='BMM') # Compute a multiple rate model depending on development
-	altricial.rate[[i]]<-model2$sigma[[1]]
-	precocial.rate[[i]]<-model2$sigma[[2]]
-	results <- list(model1,model2)
-	weights[[i]] <- aicw(results) # What are the relative AIC values for the models?
-	preferred.model[[i]] <- which(weights[[i]]$diff==0) # Which model has the greatest explanatory power relative to cost?
+	model1 <- mvBM(tree=tree[[i]], data=trait[tree[[i]]$tip], model='BM1', optimization ="subplex") # Compute a single rate brownian model
+	model2 <- mvBM(tree=tree[[i]], data= trait[tree[[i]]$tip] , model='BMM', optimization ="subplex") # Compute a multiple rate model depending on development
+	if(model1$conv==0 & model1$hess.value==0 & model2$conv==0 & model2$hess==0){
+		altricial.rate[[i]]<-model2$sigma[[1]]
+		precocial.rate[[i]]<-model2$sigma[[2]]
+		results <- list(model1,model2)
+		weights[[i]] <- aicw(results) # What are the relative AIC values for the models?
+		preferred.model[[i]] <- which(weights[[i]]$diff==0) # Which model has the greatest explanatory power relative to cost?
+	}
 	print(i)
 }
 table(unlist(preferred.model))
@@ -105,6 +107,9 @@ hist((unlist(altricial.rate)/unlist(precocial.rate))[which(unlist(lapply(weights
 
 mean((unlist(precocial.rate))[which(unlist(lapply(weights, check.diff))>2)])
 mean((unlist(altricial.rate))[which(unlist(lapply(weights, check.diff))>2)])
+
+median((unlist(precocial.rate))[which(unlist(lapply(weights, check.diff))>2)])
+median((unlist(altricial.rate))[which(unlist(lapply(weights, check.diff))>2)])
 
 sd((unlist(altricial.rate))[which(unlist(lapply(weights, check.diff))>2)])
 sd((unlist(precocial.rate))[which(unlist(lapply(weights, check.diff))>2)])
@@ -183,13 +188,15 @@ altricial.rate<-list()
 precocial.rate<-list()
 weights <- list()
 for(i in 1:length(tree)){
-	model1 <- mvBM(tree=tree[[i]], data=trait[tree[[i]]$tip], model='BM1') # single rate model
-	model2 <- mvBM(tree=tree[[i]], data= trait[tree[[i]]$tip] , model='BMM') # 2-rate model depending on developmental strategy
-	altricial.rate[[i]]<-model2$sigma[[1]]
-	precocial.rate[[i]]<-model2$sigma[[2]]
-	results <- list(model1,model2)
-	weights[[i]] <- aicw(results) # Compare AIC scores
-	preferred.model[[i]] <- which(weights[[i]]$diff==0) # Which model has the greatest explanatory power relative to its cost?
+	model1 <- mvBM(tree=tree[[i]], data=trait[tree[[i]]$tip], model='BM1', optimization ="subplex") # Compute a single rate brownian model
+	model2 <- mvBM(tree=tree[[i]], data= trait[tree[[i]]$tip] , model='BMM', optimization ="subplex") # Compute a multiple rate model depending on development
+	if(model1$conv==0 & model1$hess.value==0 & model2$conv==0 & model2$hess==0){
+		altricial.rate[[i]]<-model2$sigma[[1]]
+		precocial.rate[[i]]<-model2$sigma[[2]]
+		results <- list(model1,model2)
+		weights[[i]] <- aicw(results) # What are the relative AIC values for the models?
+		preferred.model[[i]] <- which(weights[[i]]$diff==0) # Which model has the greatest explanatory power relative to cost?
+	}
 	print(i)
 }
 # This loop may take considerable time to run.
@@ -205,6 +212,9 @@ hist((unlist(altricial.rate)/unlist(precocial.rate))[which(unlist(lapply(weights
 
 mean((unlist(precocial.rate))[which(unlist(lapply(weights, check.diff))>2)])
 mean((unlist(altricial.rate))[which(unlist(lapply(weights, check.diff))>2)])
+
+median((unlist(precocial.rate))[which(unlist(lapply(weights, check.diff))>2)])
+median((unlist(altricial.rate))[which(unlist(lapply(weights, check.diff))>2)])
 
 sd((unlist(altricial.rate))[which(unlist(lapply(weights, check.diff))>2)])
 sd((unlist(precocial.rate))[which(unlist(lapply(weights, check.diff))>2)])
